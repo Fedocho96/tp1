@@ -1,116 +1,84 @@
-import mongoose, { Document, Schema } from "mongoose";
+import {
+  createUser,
+  getUsers,
+  getUserById,
+  updateUser,
+  deleteUser,
+} from "./userLogic";
 
-import { connectDB } from "./config/mongo";
-connectDB();
-
-interface UserInterface extends Document {
-  name: string;
-  age: number;
-  email: string;
-  password: string;
-  role?: "user" | "admin";
-}
-
-const userSchema: Schema = new Schema<UserInterface>(
-  {
-    name: { type: String, required: true },
-    age: { type: Number, required: true },
-    email: {
-      type: String,
-      required: true,
-      unique: true,
-      match: /^[a-zA-Z0-9._%+-]+@[a-zA-Z0-9.-]+\.[a-zA-Z]{2,}$/,
-    },
-    password: { type: String, required: true },
-    role: { type: String, enum: ["user", "admin"], default: "user" },
-  },
-  {
-    versionKey: false,
+const main = async (
+  action: string,
+  id = "",
+  newUser = {},
+  updatedUser = {}
+) => {
+  let response;
+  switch (action) {
+    case "getUsers":
+      response = await getUsers();
+      break;
+    case "getUserById":
+      response = await getUserById(id);
+      break;
+    case "createUser":
+      response = await createUser(newUser);
+      break;
+    case "updateUser":
+      response = await updateUser(id, updatedUser);
+      break;
+    case "deleteUser":
+      response = await deleteUser(id);
+      break;
+    default:
+      response = { error: "Invalid action" };
   }
-);
-userSchema.set("strict", true);
-
-const User = mongoose.model<UserInterface>("user", userSchema);
-
-const createUser = async () => {
-  try {
-    const user: UserInterface = new User({
-      name: "Jorge Test",
-      age: 30,
-      email: "Jorgetest@gmail.com",
-      password: "123456",
-      role: "user",
-    });
-    await user.save();
-    console.log("User created:", user);
-  } catch (error) {
-    console.error("Error creating user:" + error);
-  }
+  console.log(`Response for ${action}:`, response);
 };
 
-const getUsers = async () => {
-    try {
-        const users = await User.find();
-        console.log("Users:", users);
-    } catch (error) {
-        console.error("Error getting users:" + error);
-    }
-    }
-//getUsers()
+//--------------------casos de prueba ------------------------------//
+const testGetUsers = async () => {
+  await main("getUsers");
+};
 
-const getUserById = async (id: string) => {
-    try {
-        const user = await User.findById(id);
-        if (!user) {
-            console.log("User not found");
-        } else {
-            console.log("User:", user);
-        }
-    } catch (error) {
-        console.error("Error getting user by ID:" + error);
-    }
-    };
-//existing user id
-//getUserById("68067fbeaa7c4c11690afb44")
-//non existing user id
-//getUserById("64f1a2b2e4b0c8d3f8e4b0c8")
+const testGetUserById = async () => {
+  const id = "68067fbeaa7c4c11690afb44";
+  await main("getUserById", id);
+};
 
-const updateUser = async (id: string, body: object) => {
-    try {
-        const user = await User.findByIdAndUpdate(
-            id,
-            body,
-            { new: true }
-        );
-        if (!user) {
-            console.log("User not found");
-        }
-        else {
-            console.log("User updated:", user);
-        }
-    } catch (error) {
-        console.error("Error updating user:" + error);
-    }
-    };
-//existing user id
-//updateUser("68067fbeaa7c4c11690afb44", { name: "Jorge Test nuevo" })
-//non existing user id
-//updateUser("64f1a2b2e4b0c8d3f8e4b0c8", { name: "Jorge Test nuevo" })
+const testCreateUser = async () => {
+  const newUser = {
+    name: "Jorge Test nuevo",
+    age: 30,
+    email: "jorgetest3@gmail.com",
+    password: "123123",
+  };
+  await main("createUser", "", newUser);
+};
 
-const deleteUser = async (id: string) => {
-    try {
-        const user = await User.findByIdAndDelete(id);
-        if (!user) {
-            console.log("User not found");
-        } else {
-            console.log("User deleted:", user);
-        }
-    } catch (error) {
-        console.error("Error deleting user:" + error);
-    }
-    }
-//existing user id
-//deleteUser("68067fbeaa7c4c11690afb44")
-//non existing user id
-//deleteUser("64f1a2b2e4b0c8d3f8e4b0c8")
- 
+const testUpdateUser = async () => {
+  const id = "68067fbeaa7c4c11690afb44";
+  const updatedUser = {
+    name: "Jorge Actualizado",
+    age: 31,
+  };
+  await main("updateUser", id, updatedUser);
+};
+
+const testDeleteUser = async () => {
+  const id = "68067fbeaa7c4c11690afb44";
+  await main("deleteUser", id);
+};
+
+//-------------------//-------------------//
+//Ejecutar todos los tests
+
+// const runAllTests = async () => {
+//await testGetUsers();
+//await testGetUserById();
+//await testCreateUser();
+//await testUpdateUser();
+//await testDeleteUser();
+//};
+
+//runAllTests();
+//-------------------//-------------------//
