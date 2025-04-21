@@ -56,6 +56,7 @@ const getUsers = async () => {
         console.error("Error getting users:" + error);
     }
     }
+//getUsers()
 
 const getUserById = async (id: string) => {
     try {
@@ -69,3 +70,47 @@ const getUserById = async (id: string) => {
         console.error("Error getting user by ID:" + error);
     }
     };
+//existing user id
+//getUserById("68067fbeaa7c4c11690afb44")
+//non existing user id
+//getUserById("64f1a2b2e4b0c8d3f8e4b0c8")
+
+const updateUser = async (id: string, body: object) => {
+    try {
+        const user = await User.findByIdAndUpdate(
+            id,
+            body,
+            { new: true }
+        );
+        if (!user) {
+            console.log("User not found");
+        }
+        else {
+            console.log("User updated:", user);
+        }
+    } catch (error) {
+        console.error("Error updating user:" + error);
+    }
+    };
+//existing user id
+//updateUser("68067fbeaa7c4c11690afb44", { name: "Jorge Test nuevo" })
+//non existing user id
+//updateUser("64f1a2b2e4b0c8d3f8e4b0c8", { name: "Jorge Test nuevo" })
+
+const deleteUser = async (id: string) => {
+    try {
+        const user = await User.findByIdAndDelete(id);
+        if (!user) {
+            console.log("User not found");
+        } else {
+            console.log("User deleted:", user);
+        }
+    } catch (error) {
+        console.error("Error deleting user:" + error);
+    }
+    }
+//existing user id
+//deleteUser("68067fbeaa7c4c11690afb44")
+//non existing user id
+//deleteUser("64f1a2b2e4b0c8d3f8e4b0c8")
+ 
