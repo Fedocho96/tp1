@@ -51,9 +51,21 @@ const createUser = async () => {
 const getUsers = async () => {
     try {
         const users = await User.find();
-        console.log("Users found:", users);
+        console.log("Users:", users);
     } catch (error) {
         console.error("Error getting users:" + error);
     }
     }
-    
+
+const getUserById = async (id: string) => {
+    try {
+        const user = await User.findById(id);
+        if (!user) {
+            console.log("User not found");
+        } else {
+            console.log("User:", user);
+        }
+    } catch (error) {
+        console.error("Error getting user by ID:" + error);
+    }
+    };
